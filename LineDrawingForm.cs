@@ -23,7 +23,7 @@ public class LineDrawingForm : System.Windows.Forms.Form
 	private System.Windows.Forms.Button _clearButton;
 	private System.Windows.Forms.Button _generateLinesButton;
 
-	// Pens for drawing the _lines.
+	// Pens for drawing the lines.
 	private Pen _linesPen = new Pen(Color.White, 2);
 	private Pen _hypotheticalPen = new Pen(Color.Red, 3);
 
@@ -40,70 +40,70 @@ public class LineDrawingForm : System.Windows.Forms.Form
 
 	public LineDrawingForm()
 	{
-		this._drawingPanel = new System.Windows.Forms.Panel();
-		this._numberOfLinesLabel = new System.Windows.Forms.Label();
-		this._intersectionCalculationTimeLabel = new System.Windows.Forms.Label();
-		this._clearButton = new System.Windows.Forms.Button();
-		this._generateLinesButton = new System.Windows.Forms.Button();
+		_drawingPanel = new System.Windows.Forms.Panel();
+		_numberOfLinesLabel = new System.Windows.Forms.Label();
+		_intersectionCalculationTimeLabel = new System.Windows.Forms.Label();
+		_clearButton = new System.Windows.Forms.Button();
+		_generateLinesButton = new System.Windows.Forms.Button();
 
 		// Set up labels
-		this._numberOfLinesLabel.Location = new System.Drawing.Point(24, 504);
-		this._numberOfLinesLabel.Size = new System.Drawing.Size(392, 23);
-		Update_numberOfLinesLabel();
+		_numberOfLinesLabel.Location = new System.Drawing.Point(24, 504);
+		_numberOfLinesLabel.Size = new System.Drawing.Size(392, 23);
+		UpdateNumberOfLinesLabel();
 
-		this._intersectionCalculationTimeLabel.AutoSize = true;
-		this._intersectionCalculationTimeLabel.Location = new System.Drawing.Point(124, 504);
-		this._intersectionCalculationTimeLabel.Size = new System.Drawing.Size(35, 13);
+		_intersectionCalculationTimeLabel.AutoSize = true;
+		_intersectionCalculationTimeLabel.Location = new System.Drawing.Point(124, 504);
+		_intersectionCalculationTimeLabel.Size = new System.Drawing.Size(35, 13);
 
-		this._drawingImage = new Bitmap(664, 460);
-		this._imageGraphics = Graphics.FromImage(_drawingImage);
+		_drawingImage = new Bitmap(664, 460);
+		_imageGraphics = Graphics.FromImage(_drawingImage);
 
 		// Drawing panel
-		this._drawingPanel.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+		_drawingPanel.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 			| System.Windows.Forms.AnchorStyles.Right);
-		this._drawingPanel.BackColor = System.Drawing.SystemColors.ControlDark;
-		this._drawingPanel.Location = new System.Drawing.Point(16, 16);
-		this._drawingPanel.Size = new System.Drawing.Size(664, 460);
-		this._drawingPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this._drawingPanel_MouseUp);
-		this._drawingPanel.Paint += new System.Windows.Forms.PaintEventHandler(this._drawingPanel_Paint);
-		this._drawingPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(this._drawingPanel_MouseMove);
-		this._drawingPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this._drawingPanel_MouseDown);
+		_drawingPanel.BackColor = System.Drawing.SystemColors.ControlDark;
+		_drawingPanel.Location = new System.Drawing.Point(16, 16);
+		_drawingPanel.Size = new System.Drawing.Size(664, 460);
+		_drawingPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(OnDrawingPanelMouseUp);
+		_drawingPanel.Paint += new System.Windows.Forms.PaintEventHandler(DrawingPanelPaint);
+		_drawingPanel.MouseMove += new System.Windows.Forms.MouseEventHandler(OnDrawingPanelMouseMove);
+		_drawingPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(OnDrawingPanelMouseDown);
 
 		// Clear Button
-		this._clearButton.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
-		this._clearButton.Location = new System.Drawing.Point(592, 504);
-		this._clearButton.TabIndex = 1;
-		this._clearButton.Text = "Clear";
-		this._clearButton.Click += new System.EventHandler(this._clearButton_Click);
+		_clearButton.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
+		_clearButton.Location = new System.Drawing.Point(592, 504);
+		_clearButton.TabIndex = 1;
+		_clearButton.Text = "Clear";
+		_clearButton.Click += new System.EventHandler(OnClearButtonClick);
 
-		this._generateLinesButton.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
-		this._generateLinesButton.Location = new System.Drawing.Point(482, 504);
-		this._generateLinesButton.Size = new System.Drawing.Size(100, this._generateLinesButton.Size.Height);
-		this._generateLinesButton.TabIndex = 2;
-		this._generateLinesButton.Text = "Generate lines";
-		this._generateLinesButton.Click += new System.EventHandler(this._generateLines_Click);
+		_generateLinesButton.Anchor = (System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right);
+		_generateLinesButton.Location = new System.Drawing.Point(482, 504);
+		_generateLinesButton.Size = new System.Drawing.Size(100, _generateLinesButton.Size.Height);
+		_generateLinesButton.TabIndex = 2;
+		_generateLinesButton.Text = "Generate lines";
+		_generateLinesButton.Click += new System.EventHandler(OnGenerateLinesClick);
 
 		// Set up how the form should be displayed and add the controls to the form.
 		this.ClientSize = new System.Drawing.Size(696, 534);
 		this.Controls.AddRange(
 			new System.Windows.Forms.Control[] {
-				this._intersectionCalculationTimeLabel,
-				this._generateLinesButton,
-				this._clearButton,
-				this._drawingPanel,
-				this._numberOfLinesLabel
+				_intersectionCalculationTimeLabel,
+				_generateLinesButton,
+				_clearButton,
+				_drawingPanel,
+				_numberOfLinesLabel
 			}
 		);
 
 		this.Text = "Line drawer - no intersections! ";
 	}
 
-	void Update_numberOfLinesLabel()
+	private void UpdateNumberOfLinesLabel()
 	{
-		this._numberOfLinesLabel.Text = "# of lines: " + _lines.Count;
+		_numberOfLinesLabel.Text = "# of lines: " + _lines.Count;
 	}
 
-	Boolean LineIntersectsOthers(Line newLine)
+	private Boolean LineIntersectsOthers(Line newLine)
 	{
 		Stopwatch stopwatch = new Stopwatch();
 		stopwatch.Start();
@@ -125,13 +125,13 @@ public class LineDrawingForm : System.Windows.Forms.Form
 		return false;
 	}
 
-	void UpdateIntersectionCalcTimeLabel(TimeSpan withTimeSpan)
+	private void UpdateIntersectionCalcTimeLabel(TimeSpan withTimeSpan)
 	{
 		float micros = withTimeSpan.Ticks / (TimeSpan.TicksPerMillisecond / 1000);
 		_intersectionCalculationTimeLabel.Text = "Intersection calc time: " + micros + " microseconds";
 	}
 
-	private void _drawingPanel_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+	private void OnDrawingPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
 	{
 		if (!_lineDrawingStarted)
 		{
@@ -144,51 +144,48 @@ public class LineDrawingForm : System.Windows.Forms.Form
 		}
 	}
 
-	private void _drawingPanel_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+	private void OnDrawingPanelMouseMove(object sender, System.Windows.Forms.MouseEventArgs mouseEventArgs)
 	{
 		if (_lineDrawingStarted)
 		{
-			// Update the mouse path that is drawn onto the Panel.
-			int mouseX = e.X;
-			int mouseY = e.Y;
-
 			// Draw the hypothetical line
-			_currentLine.Stop = new Point(mouseX, mouseY);
+			_currentLine.Stop = new Point(mouseEventArgs.X, mouseEventArgs.Y);
 			_drawingPanel.Invalidate();
 		}
 	}
 
-	private void _drawingPanel_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+	private void OnDrawingPanelMouseUp(object sender, System.Windows.Forms.MouseEventArgs mouseEventArgs)
 	{
 		// Draw line if clicked and dragged far enough or on 2nd click.
 		if (_lineDrawingStarted)
 		{
-			Point mouseUpLocation = new System.Drawing.Point(e.X, e.Y);
-			_currentLine.Stop = mouseUpLocation;
+			_currentLine.Stop = new Point(mouseEventArgs.X, mouseEventArgs.Y); ;
 
-			// Skip short _lines as they are probably accidental.
+			// Skip short lines as they are probably accidental.
 			if (_currentLine.Length() < 5)
 				return;
 
 			_lineDrawingStarted = false;
 
-			// Skip _lines intersecting others (the red _lines)
+			// Skip lines intersecting others (the red lines)
 			if (LineIntersectsOthers(_currentLine))
+			{
+				_drawingPanel.Invalidate();
 				return;
+			}
 
 			_lines.Add(_currentLine);
 
-			// Update image of lines.
+			// Update image of lines by adding the current line to it.
 			_imageGraphics.DrawLine(_linesPen, _currentLine.Start, _currentLine.Stop);
 
-			// Update label
-			Update_numberOfLinesLabel();
+			UpdateNumberOfLinesLabel();
 
 			_drawingPanel.Invalidate();
 		}
 	}
 
-	private void _drawingPanel_Paint(object sender, System.Windows.Forms.PaintEventArgs paintEventArgs)
+	private void DrawingPanelPaint(object sender, System.Windows.Forms.PaintEventArgs paintEventArgs)
 	{
 		paintEventArgs.Graphics.DrawImage(_drawingImage, new Point(0, 0));
 
@@ -202,18 +199,18 @@ public class LineDrawingForm : System.Windows.Forms.Form
 		}
 	}
 
-	private void _clearButton_Click(object sender, System.EventArgs e)
+	private void OnClearButtonClick(object sender, System.EventArgs eventArgs)
 	{
 		// Clear the Panel display.
 		_lines.Clear();
 		_lineDrawingStarted = false;
-		Update_numberOfLinesLabel();
+		UpdateNumberOfLinesLabel();
 		_imageGraphics.Clear(Color.Gray);
 		_drawingPanel.Invalidate();
 	}
 
 	// Attempts to generate random lines to perf test the line-intersection checks
-	private void _generateLines_Click(object sender, System.EventArgs eventArgs)
+	private void OnGenerateLinesClick(object sender, System.EventArgs eventArgs)
 	{
 		Random random = new Random();
 		int randomLengthMax = 15;
@@ -232,7 +229,7 @@ public class LineDrawingForm : System.Windows.Forms.Form
 				_imageGraphics.DrawLine(_linesPen, line.Start, line.Stop);
 			}
 		}
-		Update_numberOfLinesLabel();
+		UpdateNumberOfLinesLabel();
 		_drawingPanel.Invalidate();
 	}
 }

@@ -1,8 +1,10 @@
 ﻿/**
 	Emil Hedemalm
 	2021-02-26
-	Line and intersection checks, mainly ported from the C++ game engine work, with some small modifications.
+	Line and intersection checks, mainly ported from the C++ game engine work, with a small modification 
+	of adding a Axis-aligned Bounding-box check to the beginning of the intersection function.
 	https://github.com/erenik/engine/blob/master/src/PhysicsLib/Shapes/Line.cpp#L72
+	Originally based off of: https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 */
 
 using System;
@@ -26,25 +28,25 @@ struct Line
 
 	public Point Start;
 	public Point Stop;
+
 	public double Length()
 	{
 		return Math.Sqrt(Math.Pow(Stop.X - Start.X, 2) + Math.Pow(Stop.Y - Start.Y, 2));
 	}
 
-	float MaxX() { return Math.Max(Start.X, Stop.X); }
-	float MinX() { return Math.Min(Start.X, Stop.X); }
-	float MaxY() { return Math.Max(Start.Y, Stop.Y); }
-	float MinY() { return Math.Min(Start.Y, Stop.Y); }
+	public float MaxX() { return Math.Max(Start.X, Stop.X); }
+	public float MinX() { return Math.Min(Start.X, Stop.X); }
+	public float MaxY() { return Math.Max(Start.Y, Stop.Y); }
+	public float MinY() { return Math.Min(Start.Y, Stop.Y); }
 
-	/// Yields an orientation.
-	enum Orientation
+	public enum Orientation
 	{
 		Clockwise,
 		CounterClockwise,
 		Collinear,
 	};
 
-	Orientation GetOrientation(Point p1, Point p2, Point p3)
+	public Orientation GetOrientation(Point p1, Point p2, Point p3)
 	{
 		int val = (p1.X * p2.Y + p2.X * p3.Y + p3.X * p1.Y - p2.X * p1.Y - p3.X * p2.Y - p1.X * p3.Y);
 		if (val > 0)
@@ -56,7 +58,7 @@ struct Line
 
 	// Given three Collinear points p, q, r, the function checks if
 	// point q lies on line segment 'pr'
-	Boolean PointOnSegment(Point lineStart, Point lineStop, Point point)
+	public Boolean PointOnSegment(Point lineStart, Point lineStop, Point point)
 	{
 		if (point.X <= Math.Max(lineStart.X, lineStop.X) && point.X >= Math.Max(lineStart.X, lineStop.X) &&
 			point.Y <= Math.Max(lineStart.Y, lineStop.Y) && point.Y >= Math.Max(lineStart.Y, lineStop.Y))
