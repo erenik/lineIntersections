@@ -1,4 +1,11 @@
-﻿using System;
+﻿/**
+	Emil Hedemalm
+	2021-02-26
+	Line and intersection checks, mainly ported from the C++ game engine work, with some small modifications.
+	https://github.com/erenik/engine/blob/master/src/PhysicsLib/Shapes/Line.cpp#L72
+*/
+
+using System;
 using System.Drawing;
 
 public enum Intersection
@@ -13,20 +20,21 @@ struct Line
 {
 	public Line(Point start, Point stop)
 	{
-		this.start = start;
-		this.stop = stop;
+		this.Start = start;
+		this.Stop = stop;
 	}
 
-	public Point start, stop;
+	public Point Start;
+	public Point Stop;
 	public double Length()
 	{
-		return Math.Sqrt(Math.Pow(stop.X - start.X, 2) + Math.Pow(stop.Y - start.Y, 2));
+		return Math.Sqrt(Math.Pow(Stop.X - Start.X, 2) + Math.Pow(Stop.Y - Start.Y, 2));
 	}
 
-	float MaxX() { return Math.Max(start.X, stop.X); }
-	float MinX() { return Math.Min(start.X, stop.X); }
-	float MaxY() { return Math.Max(start.Y, stop.Y); }
-	float MinY() { return Math.Min(start.Y, stop.Y); }
+	float MaxX() { return Math.Max(Start.X, Stop.X); }
+	float MinX() { return Math.Min(Start.X, Stop.X); }
+	float MaxY() { return Math.Max(Start.Y, Stop.Y); }
+	float MinY() { return Math.Min(Start.Y, Stop.Y); }
 
 	/// Yields an orientation.
 	enum Orientation
@@ -56,23 +64,21 @@ struct Line
 		return false;
 	}
 
-	// Port of intersection test from my game engine, with some additional AABB if-checks for slight perf gain
-	// Game engine ref: https://github.com/erenik/engine/blob/master/src/PhysicsLib/Shapes/Line.cpp#L72
+	// Port of intersection test from game engine, with some additional AABB if-checks for slight perf gain
 	public Intersection Intersects(Line otherLine)
 	{
 		// Example intersection times without the Min/Max X/Y checks: 162 microseconds for 1460 lines randomly generated short lines. 
-		// Adding the below 5 lines of simplified Axis-aligned Bounding-box checks adjusted time spent to around 77 microseconds for 1491 lines (between 40us and 100us)
+		// Adding the below 5 lines of simplified Axis-aligned Bounding-box checks adjusted time spent to around 60 microseconds for 1491 lines
 		if (MaxX() < otherLine.MinX() ||
-			MinY() > otherLine.MaxX() ||
+			MinX() > otherLine.MaxX() ||
 			MaxY() < otherLine.MinY() ||
 			MinY() > otherLine.MaxY())
 			return Intersection.NoIntersection;
 
-
-		Orientation or1 = GetOrientation(start, stop, otherLine.start);
-		Orientation or2 = GetOrientation(start, stop, otherLine.stop);
-		Orientation or3 = GetOrientation(otherLine.start, otherLine.stop, start);
-		Orientation or4 = GetOrientation(otherLine.start, otherLine.stop, stop);
+		Orientation or1 = GetOrientation(Start, Stop, otherLine.Start);
+		Orientation or2 = GetOrientation(Start, Stop, otherLine.Stop);
+		Orientation or3 = GetOrientation(otherLine.Start, otherLine.Stop, Start);
+		Orientation or4 = GetOrientation(otherLine.Start, otherLine.Stop, Stop);
 
 		// Ok, we got an intersection confirmed, now the question is what type.
 		if (or1 != or2 && or3 != or4)
@@ -80,13 +86,13 @@ struct Line
 
 		// Special Cases for collinearity, may be either be end-points occuring on the other line or complete collinearity.
 		bool Collinear1 = false, Collinear2 = false;
-		if (or1 == Orientation.Collinear && PointOnSegment(start, stop, otherLine.start) ||
-			or2 == Orientation.Collinear && PointOnSegment(start, stop, otherLine.stop))
+		if (or1 == Orientation.Collinear && PointOnSegment(Start, Stop, otherLine.Start) ||
+			or2 == Orientation.Collinear && PointOnSegment(Start, Stop, otherLine.Stop))
 		{
 			Collinear1 = true;
 		}
-		if (or3 == Orientation.Collinear && PointOnSegment(otherLine.start, otherLine.stop, start) ||
-			or4 == Orientation.Collinear && PointOnSegment(otherLine.start, otherLine.stop, stop))
+		if (or3 == Orientation.Collinear && PointOnSegment(otherLine.Start, otherLine.Stop, Start) ||
+			or4 == Orientation.Collinear && PointOnSegment(otherLine.Start, otherLine.Stop, Stop))
 		{
 			Collinear2 = true;
 		}

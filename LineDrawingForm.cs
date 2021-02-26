@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+	Emil Hedemalm
+	2021-02-26
+	Small C# program where you draw lines where lines may not intersect.
+*/
+
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -7,6 +13,11 @@ using System.Diagnostics;
 public class LineDrawingForm : System.Windows.Forms.Form
 {
 	private System.Windows.Forms.Panel _drawingPanel;
+
+	private Bitmap _drawingImage;
+	private Graphics _imageGraphics;
+
+
 	private System.Windows.Forms.Label _numberOfLinesLabel;
 	private System.Windows.Forms.Label _intersectionCalculationTimeLabel;
 	private System.Windows.Forms.Button _clearButton;
@@ -44,6 +55,9 @@ public class LineDrawingForm : System.Windows.Forms.Form
 		this._intersectionCalculationTimeLabel.Location = new System.Drawing.Point(124, 504);
 		this._intersectionCalculationTimeLabel.Size = new System.Drawing.Size(35, 13);
 
+		this._drawingImage = new Bitmap(664, 460);
+		this._imageGraphics = Graphics.FromImage(_drawingImage);
+
 		// Drawing panel
 		this._drawingPanel.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
 			| System.Windows.Forms.AnchorStyles.Right);
@@ -71,11 +85,17 @@ public class LineDrawingForm : System.Windows.Forms.Form
 
 		// Set up how the form should be displayed and add the controls to the form.
 		this.ClientSize = new System.Drawing.Size(696, 534);
-		this.Controls.AddRange(new System.Windows.Forms.Control[] {
-										this._intersectionCalculationTimeLabel, this._generateLinesButton,
-										this._clearButton,this._drawingPanel,this._numberOfLinesLabel
-			});
-		this.Text = "Mouse Event Example";
+		this.Controls.AddRange(
+			new System.Windows.Forms.Control[] {
+				this._intersectionCalculationTimeLabel,
+				this._generateLinesButton,
+				this._clearButton,
+				this._drawingPanel,
+				this._numberOfLinesLabel
+			}
+		);
+
+		this.Text = "Line drawer - no intersections! ";
 	}
 
 	void Update_numberOfLinesLabel()
@@ -117,8 +137,8 @@ public class LineDrawingForm : System.Windows.Forms.Form
 		{
 			_lineDrawingStarted = true;
 			Point mouseDownLocation = new Point(e.X, e.Y);
-			_currentLine.start = mouseDownLocation;
-			_currentLine.stop = mouseDownLocation;
+			_currentLine.Start = mouseDownLocation;
+			_currentLine.Stop = mouseDownLocation;
 			_drawingPanel.Focus();
 			_drawingPanel.Invalidate();
 		}
@@ -133,7 +153,7 @@ public class LineDrawingForm : System.Windows.Forms.Form
 			int mouseY = e.Y;
 
 			// Draw the hypothetical line
-			_currentLine.stop = new Point(mouseX, mouseY);
+			_currentLine.Stop = new Point(mouseX, mouseY);
 			_drawingPanel.Invalidate();
 		}
 	}
@@ -143,10 +163,8 @@ public class LineDrawingForm : System.Windows.Forms.Form
 		// Draw line if clicked and dragged far enough or on 2nd click.
 		if (_lineDrawingStarted)
 		{
-			_drawingPanel.Invalidate();
-
 			Point mouseUpLocation = new System.Drawing.Point(e.X, e.Y);
-			_currentLine.stop = mouseUpLocation;
+			_currentLine.Stop = mouseUpLocation;
 
 			// Skip short _lines as they are probably accidental.
 			if (_currentLine.Length() < 5)
@@ -159,6 +177,11 @@ public class LineDrawingForm : System.Windows.Forms.Form
 				return;
 
 			_lines.Add(_currentLine);
+
+			// Update image of lines.
+			_imageGraphics.DrawLine(_linesPen, _currentLine.Start, _currentLine.Stop);
+
+			// Update label
 			Update_numberOfLinesLabel();
 
 			_drawingPanel.Invalidate();
@@ -167,12 +190,7 @@ public class LineDrawingForm : System.Windows.Forms.Form
 
 	private void _drawingPanel_Paint(object sender, System.Windows.Forms.PaintEventArgs paintEventArgs)
 	{
-
-		// Perform the painting of the Panel.
-		foreach (Line line in _lines)
-		{
-			paintEventArgs.Graphics.DrawLine(_linesPen, line.start, line.stop);
-		}
+		paintEventArgs.Graphics.DrawImage(_drawingImage, new Point(0, 0));
 
 		if (_lineDrawingStarted)
 		{
@@ -180,7 +198,7 @@ public class LineDrawingForm : System.Windows.Forms.Form
 				_hypotheticalPen.Color = Color.Red;
 			else
 				_hypotheticalPen.Color = Color.Green;
-			paintEventArgs.Graphics.DrawLine(_hypotheticalPen, _currentLine.start, _currentLine.stop);
+			paintEventArgs.Graphics.DrawLine(_hypotheticalPen, _currentLine.Start, _currentLine.Stop);
 		}
 	}
 
@@ -190,10 +208,11 @@ public class LineDrawingForm : System.Windows.Forms.Form
 		_lines.Clear();
 		_lineDrawingStarted = false;
 		Update_numberOfLinesLabel();
+		_imageGraphics.Clear(Color.Gray);
 		_drawingPanel.Invalidate();
 	}
 
-	// Attempts to generate 1000 random lines to perf test the line-intersection checks
+	// Attempts to generate random lines to perf test the line-intersection checks
 	private void _generateLines_Click(object sender, System.EventArgs eventArgs)
 	{
 		Random random = new Random();
@@ -208,6 +227,9 @@ public class LineDrawingForm : System.Windows.Forms.Form
 			if (!LineIntersectsOthers(line))
 			{
 				_lines.Add(line);
+
+				// Update image of lines.
+				_imageGraphics.DrawLine(_linesPen, line.Start, line.Stop);
 			}
 		}
 		Update_numberOfLinesLabel();
