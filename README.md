@@ -2,6 +2,10 @@
 
 Small C# project where you draw lines where lines may not intersect.
 
-- You can click and drag lines, or click at two places to create lines.
-- There's also two buttons - one to generate a bunch of lines for performance testing, and a button to clear the canvas/lines and restart.
-- Two labels are visible - one for the # of lines on the canvas, and one for the intersection calculation time to measure performance.
+- Click once to start drawing a line, click a second time to stop drawing.
+- Lines may not intersect, which is visualized by green and red colors while drawing the line.
+- There's a button to clear the canvas and restart.
+- There are three labels:
+  - Number of lines on the canvas,
+  - Number of line-segments in all lines on the canvas
+  - Intersection calculation time to measure performance.
